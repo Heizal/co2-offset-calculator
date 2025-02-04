@@ -1,11 +1,15 @@
 import {auth, provider } from "../config/firebase";
 import { signInWithPopup } from 'firebase/auth';
+import { useNavigate } from "react-router-dom";
 
 const Login = () =>{
+    const navigate = useNavigate();
     const handleLogin = async () =>{
         try{
             const result = await signInWithPopup(auth,provider);
             console.log("User:", result.user);
+
+            navigate("/") //navigates to home after login
         } catch (error){
             console.error("Login Error:", error);
         }
