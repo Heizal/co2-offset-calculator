@@ -11,10 +11,12 @@ describe("Climatiq API Tests", () => {
 
     const emissions = await estimateEmissions(activityId, parameters);
 
-    expect(emissions).toHaveProperty("co2e");
-    expect(emissions).toHaveProperty("co2e_unit");
-    expect(typeof emissions.co2e).toBe("number");
-    expect(emissions.co2e_unit).toBe("kg"); // Assuming the API returns kgCO2e
+    expect(emissions).not.toBeNull();
+
+    expect(emissions!.co2e).toBeDefined();
+    expect(emissions!.co2e_unit).toBeDefined();
+    expect(typeof emissions!.co2e).toBe("number");
+    expect(emissions!.co2e_unit).toBe("kg"); // Assuming the API returns kgCO2e
   });
 });
 

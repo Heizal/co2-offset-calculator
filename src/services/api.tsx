@@ -1,14 +1,20 @@
 import axios, { AxiosError } from "axios";
 
-// Load API credentials
+// Load API credentials from environment variables
 const API_BASE_URL = import.meta.env.VITE_CLIMATIQ_BASE_URL;
 const API_KEY = import.meta.env.VITE_CLIMATIQ_API_KEY;
 
+// Ensure API keys are properly set
 if (!API_BASE_URL || !API_KEY) {
   throw new Error("Missing API credentials. Please check your .env file.");
 }
 
-// Define types for API request & response
+// Type Definitions
+type EnergyUnit = "kWh";
+type WeightUnit = "kg";
+type DistanceUnit = "km" | "mi";
+type MoneyUnit = "usd" | "eur";
+
 interface EmissionRequest {
   emission_factor: {
     activity_id: string;
@@ -18,13 +24,13 @@ interface EmissionRequest {
   };
   parameters: {
     energy?: number;
-    energy_unit?: "kWh";
+    energy_unit?: EnergyUnit;
     weight?: number;
-    weight_unit?: "kg";
+    weight_unit?: WeightUnit;
     distance?: number;
-    distance_unit?: "km" | "mi";
+    distance_unit?: DistanceUnit;
     money?: number;
-    money_unit?: "usd" | "eur";
+    money_unit?: MoneyUnit;
   };
 }
 
@@ -33,11 +39,16 @@ interface EmissionResponse {
   co2e_unit: string;
 }
 
-// Function to estimate CO₂ emissions
+interface ApiError {
+  message: string;
+  status?: number;
+}
+
+// ✅ **Fix: Return `null` in case of an error**
 export const estimateEmissions = async (
   activityId: string,
   parameters: EmissionRequest["parameters"]
-): Promise<EmissionResponse> => {
+): Promise<EmissionResponse | null> => {
   const requestBody: EmissionRequest = {
     emission_factor: {
       activity_id: activityId,
@@ -59,15 +70,18 @@ export const estimateEmissions = async (
     );
     return response.data;
   } catch (error: unknown) {
+    let errorMessage = "An unexpected error occurred.";
+    let statusCode: number | undefined;
+
     if (axios.isAxiosError(error)) {
-      console.error("Axios Error:", error.response?.data || error.message);
-      throw new Error(error.response?.data?.message || "API request failed");
+      statusCode = error.response?.status;
+      errorMessage =
+        error.response?.data?.message || `Request failed with status ${statusCode}`;
     } else if (error instanceof Error) {
-      console.error("General Error:", error.message);
-      throw new Error(error.message);
-    } else {
-      console.error("Unexpected Error:", error);
-      throw new Error("An unknown error occurred");
+      errorMessage = error.message;
     }
+
+    console.error("API Error:", errorMessage);
+    return null; // ✅ Ensure a return value even on error
   }
 };
