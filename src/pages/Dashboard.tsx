@@ -1,5 +1,4 @@
 import EmissionCalculator from "../components/EmissionCalculator";
-import ResultsChart from "../components/ResultsChart";
 import { useAuth } from "../context/AuthContext";
 
 const Dashboard = () => {
@@ -22,7 +21,6 @@ const Dashboard = () => {
         {/* Results Section */}
         <div className="bg-white shadow-md p-6 rounded-lg">
           <h2 className="text-xl font-semibold text-gray-700">Your Emissions Overview</h2>
-          <ResultsChart />
         </div>
       </div>
     </div>
