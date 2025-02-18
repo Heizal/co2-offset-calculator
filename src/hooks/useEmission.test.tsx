@@ -16,10 +16,7 @@ describe("useEmission Hook", () => {
     const { result } = renderHook(() => useEmission());
 
     await act(async () => {
-      await result.current.getEmissions({
-        energy: 100,
-        energy_unit: "kWh",
-      });
+      await result.current.getEmissions(100, "daily");
     });
 
     expect(result.current.emissions).toBe(120);
@@ -34,10 +31,7 @@ describe("useEmission Hook", () => {
     const { result } = renderHook(() => useEmission());
 
     await act(async () => {
-      await result.current.getEmissions({
-        energy: 100,
-        energy_unit: "kWh",
-      });
+      await result.current.getEmissions(100, "monthly");
     });
 
     expect(result.current.emissions).toBeNull();
@@ -51,10 +45,7 @@ describe("useEmission Hook", () => {
     const { result } = renderHook(() => useEmission());
 
     act(() => {
-      result.current.getEmissions({
-        energy: 100,
-        energy_unit: "kWh",
-      });
+      result.current.getEmissions(100, "annually");
     });
 
     expect(result.current.loading).toBe(true);

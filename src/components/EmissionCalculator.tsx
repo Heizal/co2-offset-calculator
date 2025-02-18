@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 const EmissionCalculator = () => {
   const { loading, error, emissions, getEmissions } = useEmission();
   const [energy, setEnergy] = useState(""); // ✅ Allow empty input
+  const [period, setPeriod] = useState<"daily" | "monthly" | "annually">("daily");
   const [inputError, setInputError] = useState<string| null>(null);
   const navigate = useNavigate();
 
@@ -20,7 +21,7 @@ const EmissionCalculator = () => {
     setInputError(null); //Clear any previous errors
 
     
-    await getEmissions(Number(energy)); //Call with number only
+    await getEmissions(Number(energy), period); //Call with number only
 
     if (emissions !== null) {
       navigate("/results", { state: { emissions } }); // ✅ Redirect with data
@@ -30,7 +31,7 @@ const EmissionCalculator = () => {
   //Chart data
   const chartData = emissions? [
     { name: "Your Emissions", emissions: emissions }, // Dynamic emissions
-    { name: "Avg Household", emissions: 400 }, // Static comparison
+    { name: "Avg Household (Annual)", emissions: 1286 }, // Static comparison
   ] : [];
 
 
@@ -40,6 +41,7 @@ const EmissionCalculator = () => {
       <h2 className="text-2xl font-semibold text-center text-gray-800">CO₂ Emission Calculator</h2>
       <p className="text-center text-gray-600 text-sm mt-2">Enter your energy usage (in kWh) to estimate your emissions.</p>
 
+      {/* Energy Input */}
       <div className="mt-6">
         <label htmlFor="energyInput" className="block text-sm font-medium text-gray-700">
           Energy Usage (kWh):
@@ -55,6 +57,21 @@ const EmissionCalculator = () => {
         {inputError && <p className="text-red-500 text-sm mt-1">{inputError}</p>}
       </div>
 
+      {/* Time Period Selection */}
+      <div className="mt-4">
+        <label className="block text-sm font-medium text-gray-700">Select Time Period</label>
+        <select
+          value={period}
+          onChange={(e) => setPeriod(e.target.value as "daily" | "monthly" | "annually")}
+          className="mt-2 block w-full p-3 border border-gray-300 rounded-md shadow-sm"
+        >
+          <option value="daily">Daily</option>
+          <option value="monthly">Monthly</option>
+          <option value="annually">Annually</option>
+        </select>
+      </div>
+
+      {/* Calculate Button */}
       <button
         onClick={handleCalculate}
         disabled={loading || !energy} // ✅ Disable if input is empty

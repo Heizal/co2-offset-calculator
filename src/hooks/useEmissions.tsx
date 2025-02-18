@@ -5,7 +5,7 @@ interface UseEmissionResult {
   loading: boolean;
   error: string | null;
   emissions: number | null;
-  getEmissions: (energy: any) => Promise<void>;
+  getEmissions: (dailyUsageKWh: number, period: "daily" | "monthly" | "annually") => Promise<void>;
 }
 
 export const useEmission = (): UseEmissionResult => {
@@ -13,15 +13,24 @@ export const useEmission = (): UseEmissionResult => {
   const [error, setError] = useState<string | null>(null);
   const [emissions, setEmissions] = useState<number | null>(null);
 
-  const getEmissions = async (energy: number) => {
+  const getEmissions = async (dailyUsageKwh: number, period: "daily" | "monthly" | "annually") => {
     setLoading(true);
     setError(null);
 
+    const periodMultiplier: Record<"daily" | "monthly" | "annually", number> = {
+      daily: 1,
+      monthly: 30,
+      annually: 365,
+    };
+
+    const totalEnergy = dailyUsageKwh * (periodMultiplier[period]);
+
+    console.log(`🔍 Calculating emissions for ${period}: ${totalEnergy} kWh`);
+
+
     try {
-      const data = await estimateEmissions({
-        energy,
-        energy_unit: "kWh",
-      });
+      const data = await estimateEmissions(totalEnergy);
+
       if (data) {
         setEmissions(data.co2e);
       } else {
