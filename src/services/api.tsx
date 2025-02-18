@@ -1,36 +1,24 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 
-// Load API credentials from environment variables
+//Load api credentials
 const API_BASE_URL = import.meta.env.VITE_CLIMATIQ_BASE_URL;
 const API_KEY = import.meta.env.VITE_CLIMATIQ_API_KEY;
 
-// Ensure API keys are properly set
-if (!API_BASE_URL || !API_KEY) {
-  throw new Error("Missing API credentials. Please check your .env file.");
+if (!API_BASE_URL|| !API_KEY){
+  throw new Error("Missing API credentials")
 }
 
 // Type Definitions
 type EnergyUnit = "kWh";
-type WeightUnit = "kg";
-type DistanceUnit = "km" | "mi";
-type MoneyUnit = "usd" | "eur";
 
 interface EmissionRequest {
   emission_factor: {
     activity_id: string;
-    data_version?: string;
-    region?: string;
-    source?: string;
+    data_version: string;
   };
   parameters: {
-    energy?: number;
-    energy_unit?: EnergyUnit;
-    weight?: number;
-    weight_unit?: WeightUnit;
-    distance?: number;
-    distance_unit?: DistanceUnit;
-    money?: number;
-    money_unit?: MoneyUnit;
+    energy: number;
+    energy_unit: EnergyUnit;
   };
 }
 
@@ -39,23 +27,19 @@ interface EmissionResponse {
   co2e_unit: string;
 }
 
-interface ApiError {
-  message: string;
-  status?: number;
-}
-
-// ✅ **Fix: Return `null` in case of an error**
+// ✅ **Only supports energy emissions now**
 export const estimateEmissions = async (
-  activityId: string,
   parameters: EmissionRequest["parameters"]
 ): Promise<EmissionResponse | null> => {
   const requestBody: EmissionRequest = {
     emission_factor: {
-      activity_id: activityId,
-      data_version: "12.12", // Default version, can be updated
+      activity_id: "electricity-supply_grid-source_production_mix", // ✅ Verified activity ID
+      data_version: "12.12"
     },
     parameters,
   };
+
+  console.log("🚀 API Request Payload:", requestBody);
 
   try {
     const response = await axios.post<EmissionResponse>(
@@ -68,20 +52,11 @@ export const estimateEmissions = async (
         },
       }
     );
+
+    console.log("✅ API Response:", response.data);
     return response.data;
-  } catch (error: unknown) {
-    let errorMessage = "An unexpected error occurred.";
-    let statusCode: number | undefined;
-
-    if (axios.isAxiosError(error)) {
-      statusCode = error.response?.status;
-      errorMessage =
-        error.response?.data?.message || `Request failed with status ${statusCode}`;
-    } else if (error instanceof Error) {
-      errorMessage = error.message;
-    }
-
-    console.error("API Error:", errorMessage);
+  } catch (error) {
+    console.error("❌ API Error:", error);
     return null; // ✅ Ensure a return value even on error
   }
 };

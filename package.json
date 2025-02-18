@@ -46,6 +46,8 @@
     "src/**/*.{js,ts,tsx}": "eslint --fix"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.0",
+    "@heroicons/react": "^2.2.0",
     "@reduxjs/toolkit": "^2.5.1",
     "@tailwindcss/postcss": "^4.0.3",
     "axios": "^1.7.9",
@@ -53,6 +55,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.1.5"
+    "react-router-dom": "^7.1.5",
+    "recharts": "^2.15.1"
   }
 }

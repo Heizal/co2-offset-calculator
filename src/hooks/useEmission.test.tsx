@@ -16,7 +16,7 @@ describe("useEmission Hook", () => {
     const { result } = renderHook(() => useEmission());
 
     await act(async () => {
-      await result.current.getEmissions("electricity-supply_grid-source_production_mix", {
+      await result.current.getEmissions({
         energy: 100,
         energy_unit: "kWh",
       });
@@ -34,7 +34,7 @@ describe("useEmission Hook", () => {
     const { result } = renderHook(() => useEmission());
 
     await act(async () => {
-      await result.current.getEmissions("invalid_activity_id", {
+      await result.current.getEmissions({
         energy: 100,
         energy_unit: "kWh",
       });
@@ -51,7 +51,7 @@ describe("useEmission Hook", () => {
     const { result } = renderHook(() => useEmission());
 
     act(() => {
-      result.current.getEmissions("electricity-supply_grid-source_production_mix", {
+      result.current.getEmissions({
         energy: 100,
         energy_unit: "kWh",
       });

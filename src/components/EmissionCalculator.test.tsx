@@ -33,7 +33,7 @@ describe("EmissionCalculator Component", () => {
     (estimateEmissions as jest.Mock).mockImplementation(
       () =>
         new Promise((resolve) => {
-          resolveFn = resolve; // ✅ Now correctly initialized before use
+          resolveFn = resolve; 
         })
     );
   
@@ -42,15 +42,21 @@ describe("EmissionCalculator Component", () => {
             <EmissionCalculator />
         </MemoryRouter>
     );
-  
+    
+    fireEvent.change(screen.getByLabelText(/Energy Usage/i), { target: { value: "100" } });
     fireEvent.click(screen.getByRole("button", { name: /calculate emissions/i }));
   
-    // ✅ Ensure the loading state is displayed
-    await waitFor(() => expect(screen.getByRole("button")).toHaveTextContent("Calculating..."));
+   //Wait for the loading for the loading state to be disabled
+   await waitFor(() =>{
+    expect(screen.getByRole("button")).toBeDisabled();
+   })
   
     // Now resolve the promise
     resolveFn({ co2e: 100, co2e_unit: "kg" });
   
-    await waitFor(() => expect(screen.getByText(/100 kg CO₂e/i)).toBeInTheDocument());
+    // Wait for result text inside a paragraph element
+  await waitFor(() =>
+    expect(screen.getByText((content) => content.includes("100 kg CO₂e"))).toBeInTheDocument()
+  );
   });
 });

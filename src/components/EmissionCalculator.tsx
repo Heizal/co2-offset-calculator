@@ -2,24 +2,23 @@ import { useState } from "react";
 import { useEmission } from "../hooks/useEmissions";
 import { useNavigate } from "react-router-dom";
 
+
 const EmissionCalculator = () => {
   const { loading, error, emissions, getEmissions } = useEmission();
   const [energy, setEnergy] = useState(""); // ✅ Allow empty input
   const navigate = useNavigate();
 
-  const handleCalculate = async () => {
-    if (!energy) return; // ✅ Prevent calculations on empty input
 
-    await getEmissions("electricity-supply_grid-source_production_mix", {
-      energy: Number(energy), // ✅ Convert to number safely
-      energy_unit: "kWh",
-    });
+  const handleCalculate = async () => {
+    if (!energy || isNaN(Number(energy))) return; // ✅ Prevent calculations on empty input
+
+    
+    await getEmissions(Number(energy)); //Call with number only
 
     if (emissions !== null) {
       navigate("/results", { state: { emissions } }); // ✅ Redirect with data
     }
   };
-
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
       <h2 className="text-2xl font-semibold text-center text-gray-800">CO₂ Emission Calculator</h2>
@@ -46,9 +45,15 @@ const EmissionCalculator = () => {
         {loading ? "Calculating..." : "Calculate Emissions"}
       </button>
 
+      {emissions !== null &&(
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold">Results</h3>
+          <p>Estimated Emissions: <span className="font-bold">{emissions} kg CO₂e</span></p>
+        </div>
+      )}
+      
       {error && <p className="mt-2 text-red-500 text-center">{error}</p>}
     </div>
   );
 };
-
 export default EmissionCalculator;

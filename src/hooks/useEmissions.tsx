@@ -5,7 +5,7 @@ interface UseEmissionResult {
   loading: boolean;
   error: string | null;
   emissions: number | null;
-  getEmissions: (activityId: string, parameters: any) => Promise<void>;
+  getEmissions: (energy: any) => Promise<void>;
 }
 
 export const useEmission = (): UseEmissionResult => {
@@ -13,12 +13,15 @@ export const useEmission = (): UseEmissionResult => {
   const [error, setError] = useState<string | null>(null);
   const [emissions, setEmissions] = useState<number | null>(null);
 
-  const getEmissions = async (activityId: string, parameters: any) => {
+  const getEmissions = async (energy: number) => {
     setLoading(true);
     setError(null);
 
     try {
-      const data = await estimateEmissions(activityId, parameters);
+      const data = await estimateEmissions({
+        energy,
+        energy_unit: "kWh",
+      });
       if (data) {
         setEmissions(data.co2e);
       } else {
@@ -26,6 +29,7 @@ export const useEmission = (): UseEmissionResult => {
       }
     } catch (err: any) {
       setError(err.message || "Something went wrong.");
+      console.error("API ERROR", err)
     } finally {
       setLoading(false);
     }
