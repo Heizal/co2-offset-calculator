@@ -89,35 +89,3 @@ export const estimateEmissions = async (energy: number) =>{
     return null;
   }
 }
-/* export const estimateEmissions = async (
-  parameters: EmissionRequest["parameters"]
-): Promise<EmissionResponse | null> => {
-  const requestBody: EmissionRequest = {
-    emission_factor: {
-      activity_id: "electricity-supply_grid-source_production_mix", // ✅ Verified activity ID
-      data_version: "12.12"
-    },
-    parameters,
-  };
-
-  console.log("🚀 API Request Payload:", requestBody);
-
-  try {
-    const response = await axios.post<EmissionResponse>(
-      `${API_BASE_URL}/data/v1/estimate`,
-      requestBody,
-      {
-        headers: {
-          Authorization: `Bearer ${API_KEY}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    console.log("✅ API Response:", response.data);
-    return response.data;
-  } catch (error) {
-    console.error("❌ API Error:", error);
-    return null; // ✅ Ensure a return value even on error
-  }
-}; */
