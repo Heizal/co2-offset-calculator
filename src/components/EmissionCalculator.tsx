@@ -41,6 +41,11 @@ const EmissionCalculator = ({ refreshHistory}: {refreshHistory?: () => void }) =
 
     //Save the emission data
     await saveEmissionData(Number(energy), calculatedEmissions, startDate, endDate);
+
+    // ✅ Reset form inputs after calculation
+    setEnergy("");  // Reset energy input
+    setStartDate(null); // Reset start date
+    setEndDate(null);   // Reset end date
   };
 
   //Chart data
@@ -64,7 +69,7 @@ const EmissionCalculator = ({ refreshHistory}: {refreshHistory?: () => void }) =
         <input
           id="energyInput"
           type="number"
-          value={energy} // ✅ Allow clearing the field
+          value={energy}
           onChange={(e) => setEnergy(e.target.value)}
           placeholder="Enter energy usage"
           className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
