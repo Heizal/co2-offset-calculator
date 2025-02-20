@@ -1,8 +1,16 @@
 import { db } from "../config/firebase";
-import { collection, getDocs, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { collection, getDocs, addDoc, deleteDoc, doc, onSnapshot, QuerySnapshot, DocumentData } from "firebase/firestore";
 
 //Collection reference
 const emissionsCollection = collection(db, "emissions");
+
+// Define the emission data type
+interface EmissionData {
+    id: string;
+    energyUsage: number;
+    emissions: number;
+    date: string;
+  }
 
 //Save emission data
 export const saveEmissionData = async (energyUsage: number, emissions: number) => {
@@ -10,7 +18,7 @@ export const saveEmissionData = async (energyUsage: number, emissions: number) =
     await addDoc(emissionsCollection, {
       energyUsage,
       emissions,
-      data: new Date().toISOString(),
+      date: new Date().toISOString(),
     });
   } catch(error){
     console.error("Error saving emission data:", error);
@@ -31,6 +39,21 @@ export const getEmissionHistory = async () => {
       };
     });
 };
+
+//Real-time listener for emission history
+export const listenToEmissions = (callback: (data: EmissionData[]) => void) => {
+    return onSnapshot(emissionsCollection, (snapshot: QuerySnapshot<DocumentData>) => {
+    console.log("📡 Real-time update received:", snapshot.docs.length, "documents");
+
+      const data: EmissionData[] = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        energyUsage: doc.data().energyUsage || 0,
+        emissions: doc.data().emissions || 0,
+        date: doc.data().date || new Date().toISOString(),
+      }));
+      callback(data);
+    });
+  };
 
 //Clear all emission history
 export const clearEmissionHistory = async () => {

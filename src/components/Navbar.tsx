@@ -4,10 +4,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { BellIcon } from "@heroicons/react/24/outline";
 
 const navigation = [
-  { name: "Dashboard", path: "/dashboard" },
-  { name: "Team", path: "#" },
-  { name: "Projects", path: "#" },
-  { name: "Calendar", path: "#" },
+  { name: "Dashboard", path: "/dashboard" }
 ];
 
 const Navbar = () => {
@@ -17,14 +14,6 @@ const Navbar = () => {
     <nav className="bg-gray-900 text-white px-6 py-4 flex justify-between items-center shadow-md">
       {/* Left Section: Logo & Navigation */}
       <div className="flex items-center space-x-8">
-        {/* Logo */}
-        <Link to="/" className="flex items-center">
-          <img
-            src="https://tailwindui.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-            alt="Logo"
-            className="h-8 w-auto"
-          />
-        </Link>
 
         {/* Navigation Links */}
         <div className="flex space-x-6">
@@ -55,7 +44,7 @@ const Navbar = () => {
             <MenuButton className="flex items-center space-x-2 focus:outline-none">
               <span className="text-gray-300">{user.name}</span>
               <img
-                src={user.photo || "https://via.placeholder.com/40"}
+                src={user.photo || "https://cdn-icons-png.flaticon.com/128/1711/1711976.png"}
                 alt="Profile"
                 className="h-8 w-8 rounded-full"
               />

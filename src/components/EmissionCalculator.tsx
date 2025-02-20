@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useEmission } from "../hooks/useEmissions";
 import { useNavigate } from "react-router-dom";
+import { saveEmissionData } from "../services/emissionsService";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
 
 
-const EmissionCalculator = () => {
+const EmissionCalculator = ({ refreshHistory}: {refreshHistory?: () => void }) => {
   const { loading, error, emissions, getEmissions } = useEmission();
   const [energy, setEnergy] = useState(""); // ✅ Allow empty input
   const [period, setPeriod] = useState<"daily" | "monthly" | "annually">("daily");
@@ -24,6 +25,12 @@ const EmissionCalculator = () => {
     await getEmissions(Number(energy), period); //Call with number only
 
     if (emissions !== null) {
+      //Save emission data to Firestore
+      await saveEmissionData(Number(energy), emissions);
+
+      //Refresh the dashboard history to show new data
+      if (refreshHistory) refreshHistory();
+
       navigate("/results", { state: { emissions } }); // ✅ Redirect with data
     }
   };

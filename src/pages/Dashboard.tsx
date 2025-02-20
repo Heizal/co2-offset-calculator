@@ -1,25 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import EmissionCalculator from "../components/EmissionCalculator";
 import { useAuth } from "../context/AuthContext";
-import { getEmissionHistory } from "../services/emissionsService";
+import { listenToEmissions } from "../services/emissionsService";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const [history, setHistory] = useState<{ id: string; energyUsage: number; emissions: number; date: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
-  //Fetch emission history
+  // Listen for real-time updates
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getEmissionHistory();
-      console.log("Fetched data:", data);
+    const unsubscribe = listenToEmissions((data) => {
       setHistory(data);
-      setLoading(false);
-    };
+      setLoading(false); // ✅ Reset loading state when real-time data arrives
+    });
 
-    fetchData();
-  }
-  , []);
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
@@ -37,7 +34,6 @@ const Dashboard = () => {
       <div className="grid gap-6 md:gap-10 md:grid-cols-2">
         {/* Left Section: CO₂ Calculator */}
         <div className="bg-white shadow-lg rounded-lg p-6 md:p-8">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">CO₂ Emission Calculator</h2>
           <EmissionCalculator />
         </div>
 
