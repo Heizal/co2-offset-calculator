@@ -5,11 +5,12 @@ import { listenToEmissions } from "../services/emissionsService";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const [history, setHistory] = useState<{ id: string; energyUsage: number; emissions: number; date: string }[]>([]);
+  const [history, setHistory] = useState<{ id: string; energyUsage: number; emissions: number; startDate: string; endDate: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Listen for real-time updates
   useEffect(() => {
+    console.log("Listening for real-time updates...");
     const unsubscribe = listenToEmissions((data) => {
       setHistory(data);
       setLoading(false); // ✅ Reset loading state when real-time data arrives
@@ -49,7 +50,9 @@ const Dashboard = () => {
             <ul className="bg-gray-100 p-4 rounded-md max-h-60 overflow-y-auto">
               {history.map((entry) => (
                 <li key={entry.id} className="mb-2 text-sm">
-                  📅 {new Date(entry.date).toLocaleDateString()} - ⚡ {entry.energyUsage} kWh → 🌍 {entry.emissions.toFixed(2)} kg CO₂
+                  📅 <strong>{new Date(entry.startDate).toLocaleDateString()}</strong> → <strong>{new Date(entry.endDate).toLocaleDateString()}</strong>  
+                  <br />
+                  ⚡ <strong>{entry.energyUsage} kWh</strong> → 🌍 <strong>{entry.emissions.toFixed(2)} kg CO₂</strong>
                 </li>
               ))}
             </ul>

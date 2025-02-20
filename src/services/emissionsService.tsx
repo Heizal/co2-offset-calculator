@@ -13,12 +13,14 @@ interface EmissionData {
   }
 
 //Save emission data
-export const saveEmissionData = async (energyUsage: number, emissions: number) => {
+export const saveEmissionData = async (energyUsage: number, emissions: number, startDate: Date, endDate: Date) => {
   try{
     await addDoc(emissionsCollection, {
       energyUsage,
       emissions,
-      date: new Date().toISOString(),
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      createdAt: new Date().toISOString(),
     });
   } catch(error){
     console.error("Error saving emission data:", error);
@@ -35,25 +37,29 @@ export const getEmissionHistory = async () => {
         id: doc.id,
         energyUsage: data.energyUsage || 0, // Ensure default values
         emissions: data.emissions || 0,
-        date: data.date || new Date().toISOString(),
+        startDate: data.startDate ? data.startDate : new Date().toISOString(), // Ensure startDate exists
+        endDate: data.endDate ? data.endDate : new Date().toISOString(), // Ensure endDate exists
       };
     });
 };
 
 //Real-time listener for emission history
-export const listenToEmissions = (callback: (data: EmissionData[]) => void) => {
+export const listenToEmissions = (callback: (data: { id: string; energyUsage: number; emissions: number; startDate: string; endDate: string }[]) => void) => {
     return onSnapshot(emissionsCollection, (snapshot: QuerySnapshot<DocumentData>) => {
-    console.log("📡 Real-time update received:", snapshot.docs.length, "documents");
-
-      const data: EmissionData[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        energyUsage: doc.data().energyUsage || 0,
-        emissions: doc.data().emissions || 0,
-        date: doc.data().date || new Date().toISOString(),
-      }));
+      const data = snapshot.docs.map((doc) => {
+        const docData = doc.data();
+        return {
+          id: doc.id,
+          energyUsage: docData.energyUsage || 0,
+          emissions: docData.emissions || 0,
+          startDate: docData.startDate ? docData.startDate : new Date().toISOString(), // Ensure startDate exists
+          endDate: docData.endDate ? docData.endDate : new Date().toISOString(), // Ensure endDate exists
+        };
+      });
+  
       callback(data);
     });
-  };
+};
 
 //Clear all emission history
 export const clearEmissionHistory = async () => {

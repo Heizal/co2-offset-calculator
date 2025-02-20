@@ -4,35 +4,43 @@ import { useNavigate } from "react-router-dom";
 import { saveEmissionData } from "../services/emissionsService";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 
 const EmissionCalculator = ({ refreshHistory}: {refreshHistory?: () => void }) => {
   const { loading, error, emissions, getEmissions } = useEmission();
   const [energy, setEnergy] = useState(""); // ✅ Allow empty input
-  const [period, setPeriod] = useState<"daily" | "monthly" | "annually">("daily");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [inputError, setInputError] = useState<string| null>(null);
-  const navigate = useNavigate();
 
 
   const handleCalculate = async () => {
     if (!energy || isNaN(Number(energy)) || Number(energy) <= 0){
       setInputError("Please enter a valid positive number");
       return;  
-    } // ✅ Prevent calculations on empty input
+    }
+
+    if (!startDate || !endDate){
+      setInputError("Please select a date range");
+      return;
+    }
+
     setInputError(null); //Clear any previous errors
 
-    
-    await getEmissions(Number(energy), period); //Call with number only
+    //Wait for the emissions to be calculated
+    const calculatedEmissions = await getEmissions(Number(energy), startDate, endDate);
 
-    if (emissions !== null) {
-      //Save emission data to Firestore
-      await saveEmissionData(Number(energy), emissions);
-
-      //Refresh the dashboard history to show new data
-      if (refreshHistory) refreshHistory();
-
-      navigate("/results", { state: { emissions } }); // ✅ Redirect with data
+    if (calculatedEmissions == null) {
+      console.error("Emission calculation failed");
+      return
     }
+
+    console.log("Emissions calculated:", calculatedEmissions);
+
+    //Save the emission data
+    await saveEmissionData(Number(energy), calculatedEmissions, startDate, endDate);
   };
 
   //Chart data
@@ -66,16 +74,28 @@ const EmissionCalculator = ({ refreshHistory}: {refreshHistory?: () => void }) =
 
       {/* Time Period Selection */}
       <div className="mt-4">
-        <label className="block text-sm font-medium text-gray-700">Select Time Period</label>
-        <select
-          value={period}
-          onChange={(e) => setPeriod(e.target.value as "daily" | "monthly" | "annually")}
-          className="mt-2 block w-full p-3 border border-gray-300 rounded-md shadow-sm"
-        >
-          <option value="daily">Daily</option>
-          <option value="monthly">Monthly</option>
-          <option value="annually">Annually</option>
-        </select>
+        <label className="block text-sm font-medium text-gray-700">Select Date Range</label>
+        <div className="flex space-x-4 mt-2">
+          <DatePicker
+            selected={startDate}
+            onChange={(date) => setStartDate(date)}
+            selectsStart
+            startDate={startDate}
+            endDate={endDate}
+            className="p-3 border border-gray-300 rounded-md shadow-sm"
+            placeholderText="Start Date"
+          />
+          <DatePicker
+            selected={endDate}
+            onChange={(date) => setEndDate(date)}
+            selectsEnd
+            startDate={startDate}
+            endDate={endDate}
+            minDate={startDate || undefined}
+            className="p-3 border border-gray-300 rounded-md shadow-sm"
+            placeholderText="End Date"
+          />
+        </div>
       </div>
 
       {/* Calculate Button */}
