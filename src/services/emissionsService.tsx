@@ -63,8 +63,12 @@ export const listenToEmissions = (callback: (data: { id: string; energyUsage: nu
 
 //Clear all emission history
 export const clearEmissionHistory = async () => {
-  const snapshot = await getDocs(emissionsCollection);
-  snapshot.forEach(async (docRef) => {
-    await deleteDoc(doc(db, "emissions", docRef.id));
-  });
-}
+  try{
+    const snapshot = await getDocs(emissionsCollection)
+    const deletePromises = snapshot.docs.map((document) => deleteDoc(doc(db, "emissions", document.id)));
+    await Promise.all(deletePromises); // Wait for all delete promises to resolve
+    console.log("All emisssion history cleared");
+  } catch(error){
+    console.error("Error clearing emission history:", error);
+  }
+};

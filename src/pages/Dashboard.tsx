@@ -1,12 +1,21 @@
 import { useState, useEffect, use } from "react";
 import EmissionCalculator from "../components/EmissionCalculator";
 import { useAuth } from "../context/AuthContext";
-import { listenToEmissions } from "../services/emissionsService";
+import { listenToEmissions, clearEmissionHistory } from "../services/emissionsService";
+
+interface EmissionHistory {
+  id: string;
+  energyUsage: number;
+  emissions: number;
+  startDate: string;
+  endDate: string;
+}
 
 const Dashboard = () => {
   const { user } = useAuth();
   const [history, setHistory] = useState<{ id: string; energyUsage: number; emissions: number; startDate: string; endDate: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [clearing, setClearing] = useState(false);
 
   // Listen for real-time updates
   useEffect(() => {
@@ -18,6 +27,16 @@ const Dashboard = () => {
 
     return () => unsubscribe();
   }, []);
+
+  //Handle clear History button click
+  const handleClearHistory = async () => {
+    const confirmDelete = window.confirm("Are you sure you want to clear all emission history?");
+    if (!confirmDelete) return;
+
+    setClearing(true); // Show loading state while clearing
+    await clearEmissionHistory();
+    setClearing(false);
+  };
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
@@ -47,6 +66,7 @@ const Dashboard = () => {
           ) : history.length === 0 ? (
             <p className="text-gray-500">No emissions data available.</p>
           ) : (
+          <>
             <ul className="bg-gray-100 p-4 rounded-md max-h-60 overflow-y-auto">
               {history.map((entry) => (
                 <li key={entry.id} className="mb-2 text-sm">
@@ -56,6 +76,18 @@ const Dashboard = () => {
                 </li>
               ))}
             </ul>
+
+            {/* ✅ Clear History Button */}
+            <button
+              onClick={handleClearHistory}
+              disabled={clearing}
+              className={`mt-4 w-full px-4 py-2 font-semibold text-white rounded-md ${
+                clearing ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-700"
+              }`}
+              >
+              {clearing ? "Clearing..." : "Clear History"}
+            </button>
+          </>
           )}
         </div>
       </div>
