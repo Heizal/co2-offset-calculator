@@ -15,24 +15,21 @@ interface EmissionHistory {
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const [history, setHistory] = useState<{ 
-    id: string; 
-    energyUsage: number; 
-    emissions: number; 
-    startDate: string; 
-    endDate: string; 
-    region_name?: string;
-    sector?: string;
-  }[]>([]);
+  const [history, setHistory] = useState<EmissionHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [clearing, setClearing] = useState(false);
 
-  // Listen for real-time updates
   useEffect(() => {
     console.log("Listening for real-time updates...");
     const unsubscribe = listenToEmissions((data) => {
-      setHistory(data);
-      setLoading(false); // ✅ Reset loading state when real-time data arrives
+      const formattedData = data.map(item => ({
+        ...item,
+        region_name: item.region_name || "Unknown",
+        sector: item.sector || "Unknown"
+      }));
+      formattedData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      setHistory(formattedData);
+      setLoading(false);
     });
 
     return () => unsubscribe();
@@ -83,45 +80,55 @@ const Dashboard = () => {
           ) : !latestEntry ? (
             <p className="text-gray-500 mt-4">No emissions data available.</p>
           ) : (
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Emission Amount */}
-              <div className="bg-[#1E1E1E] p-4 rounded-lg">
-                <h4 className="text-sm text-gray-400">Total CO₂ Emitted</h4>
-                <p className="text-2xl font-bold text-green-400">{latestEntry.emissions.toFixed(2)} kg CO₂</p>
-              </div>
-
-              {/* Date Range */}
-              <div className="bg-[#1E1E1E] p-4 rounded-lg">
-                <h4 className="text-sm text-gray-400">Time Period</h4>
-                <p className="text-lg font-semibold">
-                  {new Date(latestEntry.startDate).toLocaleDateString()} → {new Date(latestEntry.endDate).toLocaleDateString()}
-                </p>
-              </div>
-
-              {/* Sector */}
-              {latestEntry.sector && latestEntry.sector !== "Unknown" && (
+            <>
+              {/* 🔥 Latest Calculation Cards */}
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-[#1E1E1E] p-4 rounded-lg">
+                  <h4 className="text-sm text-gray-400">Total CO₂ Emitted</h4>
+                  <p className={`text-2xl font-bold ${latestEntry.emissions > 500 ? "text-red-400" : "text-green-400"}`}>
+                    {latestEntry.emissions.toFixed(2)} kg CO₂
+                  </p>
+                </div>
+                <div className="bg-[#1E1E1E] p-4 rounded-lg">
+                  <h4 className="text-sm text-gray-400">Time Period</h4>
+                  <p className="text-lg font-semibold">
+                    {new Date(latestEntry.startDate).toLocaleDateString()} → {new Date(latestEntry.endDate).toLocaleDateString()}
+                  </p>
+                </div>
                 <div className="bg-[#1E1E1E] p-4 rounded-lg">
                   <h4 className="text-sm text-gray-400">Emission Category</h4>
                   <p className="text-lg font-semibold">{latestEntry.sector}</p>
                 </div>
-              )}
-
-              {/* Region Name (Show only if available) */}
-              {latestEntry.region_name && latestEntry.region_name !== "Unknown" && (
                 <div className="bg-[#1E1E1E] p-4 rounded-lg">
                   <h4 className="text-sm text-gray-400">Region</h4>
                   <p className="text-lg font-semibold">{latestEntry.region_name}</p>
                 </div>
-              )}
-
-              {/* Comparison (if more stats exist) */}
-              <div className="bg-[#1E1E1E] p-4 rounded-lg">
-                <h4 className="text-sm text-gray-400">Comparison</h4>
-                <p className="text-lg font-semibold">
-                  {latestEntry.emissions > 500 ? "Above average 🌍" : "Below average ✅"}
-                </p>
               </div>
-            </div>
+
+              {/* 📜 Past Emissions History */}
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold mb-2">Past Emissions</h3>
+                <div className="bg-[#1E1E1E] rounded-lg p-4 max-h-60 overflow-y-auto">
+                  {history.length > 1 ? (
+                    history.slice(1).map((entry) => (
+                      <div key={entry.id} className="flex justify-between items-center border-b border-gray-700 py-2">
+                        <div>
+                          <p className="text-sm text-gray-400">
+                            📅 {new Date(entry.startDate).toLocaleDateString()} → {new Date(entry.endDate).toLocaleDateString()}
+                          </p>
+                          <p className="text-sm text-gray-300">
+                            ⚡ {entry.energyUsage} kWh → 🌍 {entry.emissions.toFixed(2)} kg CO₂
+                          </p>
+                        </div>
+                        <span className="text-sm text-gray-500">{entry.region_name}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-sm">No past emissions data.</p>
+                  )}
+                </div>
+              </div>
+            </>
           )}
 
           {/* Clear History Button */}
