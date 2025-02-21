@@ -31,13 +31,6 @@ const Navbar = () => {
 
       {/* Right Section: Notifications & User */}
       <div className="flex items-center space-x-6">
-        {/* Notification Bell */}
-        {user && (
-          <button className="relative rounded-full bg-gray-800 p-2 text-gray-400 hover:text-white">
-            <BellIcon className="h-6 w-6" />
-          </button>
-        )}
-
         {/* User Profile & Logout */}
         {user ? (
           <Menu as="div" className="relative">

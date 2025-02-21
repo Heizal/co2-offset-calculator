@@ -1,23 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* ✅ Reset Default Styles */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  /* ✅ Set a basic font */
-  body {
-    font-family: "Arial", sans-serif;
-    background-color: #f5f5f5;
-    color: #333;
-  }
-  
-  /* ✅ Ensure content is centered */
-  #root {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-  }
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ✅ Set a basic font */
+body {
+  font-family: "Arial", sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+/* ✅ Ensure Full Height for Background */
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ✅ Fix Container Width Issues */
+.container {
+  max-width: 1280px;
+  width: 90%;
+  margin: auto;
+}
   
