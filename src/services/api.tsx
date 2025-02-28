@@ -36,7 +36,8 @@ export const fetchEmissionFactor = async () =>{
       },
       params:{
         query: "electricity consumption",
-        data_version: "12.12"
+        data_version: "12.12",
+        region: "DE"
       }
     });
 
