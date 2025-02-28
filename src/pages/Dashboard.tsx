@@ -11,6 +11,7 @@ interface EmissionHistory {
   endDate: string;
   region_name: string;
   sector: string;
+  createdAt: string;
 }
 
 const Dashboard = () => {
@@ -46,7 +47,11 @@ const Dashboard = () => {
   };
 
   // ✅ Get latest emission data
-  const latestEntry = history.length > 0 ? history[history.length - 1] : null;
+  const latestEntry = history.length > 0 
+  ? history.reduce((latest, entry) =>
+      new Date(entry.createdAt) > new Date(latest.createdAt) ? entry : latest, history[0])
+  : null;
+
 
   return (
     <div className="p-6 md:p-8 max-w-6xl mx-auto">

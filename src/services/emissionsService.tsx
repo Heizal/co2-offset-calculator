@@ -23,11 +23,17 @@ export const saveEmissionData = async (energyUsage: number, emissions: number, s
 
 //Real-time listener for emission history
 export const listenToEmissions = (callback: (data: any[]) => void) => {
+  console.log("Attaching realtime listener")
+  
   return onSnapshot(emissionsCollection, (snapshot) => {
+    console.log("Firestore real.time update received", snapshot.docs.length, "documents")
+
     const data = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
     }));
+
+    console.log("Emission history updated:", data);
     callback(data);
   });
 };
