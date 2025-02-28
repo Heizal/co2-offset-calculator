@@ -39,6 +39,7 @@ const EmissionCalculator = () => {
   // ✅ Extract sector & region_name from API response
   const category = emissionFactorData.category || "Unknown"; 
   const region_name = emissionFactorData.region_name || "Unknown";
+  const description = emissionFactorData.description || "No specific description";
 
     const calculatedEmissions = await getEmissions(Number(energy), startDate, endDate);
 
@@ -49,7 +50,7 @@ const EmissionCalculator = () => {
 
     console.log("Emissions calculated:", calculatedEmissions);
 
-    await saveEmissionData(Number(energy), calculatedEmissions, startDate, endDate, category, region_name);
+    await saveEmissionData(Number(energy), calculatedEmissions, startDate, endDate, category, region_name, description);
 
     // ✅ Reset form inputs after calculation
     setEnergy("");  

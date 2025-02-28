@@ -12,6 +12,7 @@ interface EmissionHistory {
   region_name: string;
   category: string;
   createdAt: string;
+  description: string;
 }
 
 const Dashboard = () => {
@@ -75,9 +76,19 @@ const Dashboard = () => {
         {/* Right Section: Emission Overview */}
         <div className="bg-[#121212] text-white shadow-lg rounded-lg p-6 md:p-8">
           <h2 className="text-2xl font-semibold mb-2">Your Emissions Overview</h2>
-          <p className="text-gray-400 text-sm">
-            Here’s a breakdown of your carbon footprint based on your latest calculation.
-          </p>
+
+          {/* ✅ DISPLAY Category */}
+          {latestEntry?.category && (
+            <p className="text-lg font-semibold">
+              {latestEntry.category}
+            </p>
+          )}
+          {/* ✅ DISPLAY Description */}
+          {latestEntry?.description && (
+            <p className="text-gray-400 text-sm italic mb-4">
+              {latestEntry.description}
+            </p>
+          )}
 
           {/* If no data available */}
           {loading ? (

@@ -5,7 +5,7 @@ import { collection, getDocs, addDoc, deleteDoc, doc, onSnapshot, QuerySnapshot,
 const emissionsCollection = collection(db, "emissions");
 
 //Save emission data
-export const saveEmissionData = async (energyUsage: number, emissions: number, startDate: Date, endDate: Date, category: string, region_name: string, ) => {
+export const saveEmissionData = async (energyUsage: number, emissions: number, startDate: Date, endDate: Date, category: string, region_name: string, description: string ) => {
   try{
     await addDoc(emissionsCollection, {
       energyUsage,
@@ -16,6 +16,7 @@ export const saveEmissionData = async (energyUsage: number, emissions: number, s
       // sector,
       category,
       region_name,
+      description
     });
   } catch(error){
     console.error("Error saving emission data:", error);
@@ -32,6 +33,7 @@ export const listenToEmissions = (callback: (data: any[]) => void) => {
     const data = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
+      description: doc.data().description || "No specific description",
     }));
 
     console.log("Emission history updated:", data);
