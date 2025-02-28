@@ -10,7 +10,7 @@ interface EmissionHistory {
   startDate: string;
   endDate: string;
   region_name: string;
-  sector: string;
+  category: string;
   createdAt: string;
 }
 
@@ -102,7 +102,7 @@ const Dashboard = () => {
                 </div>
                 <div className="bg-[#1E1E1E] p-4 rounded-lg">
                   <h4 className="text-sm text-gray-400">Emission Category</h4>
-                  <p className="text-lg font-semibold">{latestEntry.sector}</p>
+                  <p className="text-lg font-semibold">{latestEntry.category}</p>
                 </div>
                 <div className="bg-[#1E1E1E] p-4 rounded-lg">
                   <h4 className="text-sm text-gray-400">Region</h4>

@@ -5,7 +5,7 @@ import { collection, getDocs, addDoc, deleteDoc, doc, onSnapshot, QuerySnapshot,
 const emissionsCollection = collection(db, "emissions");
 
 //Save emission data
-export const saveEmissionData = async (energyUsage: number, emissions: number, startDate: Date, endDate: Date, sector: string, region_name: string, ) => {
+export const saveEmissionData = async (energyUsage: number, emissions: number, startDate: Date, endDate: Date, category: string, region_name: string, ) => {
   try{
     await addDoc(emissionsCollection, {
       energyUsage,
@@ -13,7 +13,8 @@ export const saveEmissionData = async (energyUsage: number, emissions: number, s
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
       createdAt: new Date().toISOString(),
-      sector,
+      // sector,
+      category,
       region_name,
     });
   } catch(error){
@@ -24,7 +25,7 @@ export const saveEmissionData = async (energyUsage: number, emissions: number, s
 //Real-time listener for emission history
 export const listenToEmissions = (callback: (data: any[]) => void) => {
   console.log("Attaching realtime listener")
-  
+
   return onSnapshot(emissionsCollection, (snapshot) => {
     console.log("Firestore real.time update received", snapshot.docs.length, "documents")
 
