@@ -1,88 +1,78 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
+import { describe, test, expect, vi } from "vitest";
+import { fetchEmissionFactor, estimateEmissions } from "../services/api";
 
-// Load API credentials from environment variables
-const API_BASE_URL = import.meta.env.VITE_CLIMATIQ_BASE_URL;
-const API_KEY = import.meta.env.VITE_CLIMATIQ_API_KEY;
+vi.mock("axios");
+const mockedAxios = vi.mocked(axios, true);
 
-// Ensure API keys are properly set
-if (!API_BASE_URL || !API_KEY) {
-  throw new Error("Missing API credentials. Please check your .env file.");
-}
+beforeEach(() => {
+  vi.clearAllMocks(); 
+});
 
-// Type Definitions
-type EnergyUnit = "kWh";
-type WeightUnit = "kg";
-type DistanceUnit = "km" | "mi";
-type MoneyUnit = "usd" | "eur";
+describe("API Service - fetchEmissionFactor", () => {
+  test("should return the first matching emission factor on success", async () => {
+    const mockEmissionFactor = { id: "factor_1", name: "Electricity Emission Factor", co2e: 0.5 };
 
-interface EmissionRequest {
-  emission_factor: {
-    activity_id: string;
-    data_version?: string;
-    region?: string;
-    source?: string;
-  };
-  parameters: {
-    energy?: number;
-    energy_unit?: EnergyUnit;
-    weight?: number;
-    weight_unit?: WeightUnit;
-    distance?: number;
-    distance_unit?: DistanceUnit;
-    money?: number;
-    money_unit?: MoneyUnit;
-  };
-}
+    mockedAxios.get.mockResolvedValueOnce({ data: { results: [mockEmissionFactor] } });
 
-interface EmissionResponse {
-  co2e: number;
-  co2e_unit: string;
-}
+    const result = await fetchEmissionFactor();
 
-interface ApiError {
-  message: string;
-  status?: number;
-}
+    expect(result).toEqual(mockEmissionFactor);
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+  });
 
-// ✅ **Fix: Return `null` in case of an error**
-export const estimateEmissions = async (
-  activityId: string,
-  parameters: EmissionRequest["parameters"]
-): Promise<EmissionResponse | null> => {
-  const requestBody: EmissionRequest = {
-    emission_factor: {
-      activity_id: activityId,
-      data_version: "12.12", // Default version, can be updated
-    },
-    parameters,
-  };
+  test("should return null if no emission factor is found", async () => {
+    mockedAxios.get.mockResolvedValueOnce({ data: { results: [] } });
 
-  try {
-    const response = await axios.post<EmissionResponse>(
-      `${API_BASE_URL}/data/v1/estimate`,
-      requestBody,
-      {
-        headers: {
-          Authorization: `Bearer ${API_KEY}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    return response.data;
-  } catch (error: unknown) {
-    let errorMessage = "An unexpected error occurred.";
-    let statusCode: number | undefined;
+    const result = await fetchEmissionFactor();
 
-    if (axios.isAxiosError(error)) {
-      statusCode = error.response?.status;
-      errorMessage =
-        error.response?.data?.message || `Request failed with status ${statusCode}`;
-    } else if (error instanceof Error) {
-      errorMessage = error.message;
-    }
+    expect(result).toBeNull();
+  });
 
-    console.error("API Error:", errorMessage);
-    return null; // ✅ Ensure a return value even on error
-  }
-};
+  test("should return null on API error", async () => {
+    mockedAxios.get.mockRejectedValueOnce(new Error("Network error"));
+
+    const result = await fetchEmissionFactor();
+
+    expect(result).toBeNull();
+  });
+});
+
+describe("API Service - estimateEmissions", () => {
+  test("should return emission data on success", async () => {
+    const mockEmissionFactor = { id: "factor_1", name: "Electricity Emission Factor", co2e: 0.5 };
+    const mockResponse = { co2e: 200, co2e_unit: "kg" };
+
+    mockedAxios.get.mockResolvedValueOnce({ data: { results: [mockEmissionFactor] } });
+    mockedAxios.post.mockResolvedValueOnce({ data: mockResponse });
+
+    const result = await estimateEmissions(100);
+
+    expect(result).toEqual(mockResponse);
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.post).toHaveBeenCalledTimes(1);
+  });
+
+  test("should return null if emission factor retrieval fails", async () => {
+    mockedAxios.get.mockResolvedValueOnce({ data: { results: [] } });
+
+    const result = await estimateEmissions(100);
+
+    expect(result).toBeNull();
+    expect(mockedAxios.get).toHaveBeenCalledTimes(1);
+    expect(mockedAxios.post).toHaveBeenCalledTimes(0);
+  });
+
+  test("should return null if API request fails", async () => {
+    const mockEmissionFactor = { id: "factor_1", name: "Electricity Emission Factor", co2e: 0.5 };
+
+    mockedAxios.get.mockResolvedValueOnce({ data: { results: [mockEmissionFactor] } });
+    mockedAxios.post.mockRejectedValueOnce(new Error("API error"));
+
+    const result = await estimateEmissions(100);
+
+    expect(result).toBeNull();
+  });
+});
+
 
