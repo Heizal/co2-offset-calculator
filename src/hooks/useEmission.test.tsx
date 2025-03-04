@@ -15,8 +15,11 @@ describe("useEmission Hook", () => {
 
     const { result } = renderHook(() => useEmission());
 
+    const startDate = new Date('2023-01-01');
+    const endDate = new Date('2023-01-31');
+
     await act(async () => {
-      await result.current.getEmissions(100, "daily");
+      await result.current.getEmissions(100, startDate, endDate);
     });
 
     expect(result.current.emissions).toBe(120);
@@ -30,8 +33,11 @@ describe("useEmission Hook", () => {
 
     const { result } = renderHook(() => useEmission());
 
+    const startDate = new Date('2023-01-01');
+    const endDate = new Date('2023-01-31');
+
     await act(async () => {
-      await result.current.getEmissions(100, "monthly");
+      await result.current.getEmissions(100, startDate, endDate);
     });
 
     expect(result.current.emissions).toBeNull();
@@ -44,8 +50,11 @@ describe("useEmission Hook", () => {
 
     const { result } = renderHook(() => useEmission());
 
+    const startDate = new Date('2023-01-01');
+    const endDate = new Date('2023-01-31');
+
     act(() => {
-      result.current.getEmissions(100, "annually");
+      result.current.getEmissions(100, startDate, endDate);
     });
 
     expect(result.current.loading).toBe(true);
