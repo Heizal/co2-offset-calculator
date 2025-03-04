@@ -16,7 +16,7 @@ describe("Navbar", () => {
       </AuthProvider>
     );
 
-    expect(screen.getByText("CO₂ Offset Calculator")).toBeInTheDocument();
-    expect(screen.getByText("Home")).toBeInTheDocument();
+    expect(screen.getByText(/Dashboard/i)).toBeInTheDocument();
+    expect(screen.getByText(/Login/i)).toBeInTheDocument();
   });
 });
