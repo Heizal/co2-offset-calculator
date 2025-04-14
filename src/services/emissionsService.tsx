@@ -18,7 +18,6 @@ export const saveEmissionData = async (energyUsage: number, emissions: number, s
       startDate: startDate.toISOString(),
       endDate: endDate.toISOString(),
       createdAt: new Date().toISOString(),
-      // sector,
       category,
       region_name,
       description
@@ -54,8 +53,9 @@ export const clearEmissionHistory = async () => {
   try{
     const user = getAuth().currentUser;
     if (!user) throw new Error("User not authenticated");
+    const userQuery = query(emissionsCollection, where("userId", "==", user.uid));
 
-    const snapshot = await getDocs(emissionsCollection)
+    const snapshot = await getDocs(userQuery)
     const deletePromises = snapshot.docs.map((document) => deleteDoc(doc(db, "emissions", document.id)));
     await Promise.all(deletePromises); // Wait for all delete promises to resolve
     console.log("All emisssion history cleared");
