@@ -29,37 +29,37 @@ const Login = () =>{
     };
 
     return (
-        <div className="h-screen w-screen bg-black flex items-start justify-center relative px-4">
-          {/* Overlay Glow Effect */}
-          <div className="absolute inset-0 bg-black/70"></div>
+      <div
+      className="min-h-screen w-full bg-cover bg-center flex items-center justify-center relative px-6"
+      style={{
+        backgroundImage:
+          "url('https://images.pexels.com/photos/1367192/pexels-photo-1367192.jpeg?auto=compress&cs=tinysrgb&w=600')",
+      }}
+    >
+          {/* Main Content */}
+          <div className="relative z-10 text-center max-w-xl">
+            <h1 className="text-5xl md:text-6xl font-bold text-[#d35400] leading-tight mb-4">
+              3.5<br />
+              <span className="text-4xl md:text-5xl">Gigaton CO₂e</span>
+              <span className="block text-xl md:text-2xl font-light text-[#a3542a] mt-1">
+                / Year
+              </span>
+            </h1>
 
-          {/* Login Box (Not Fully Centered) */}
-          <motion.div
-            className="relative z-10 mt-32 md:mt-48 bg-white/10 backdrop-blur-xl shadow-lg rounded-xl px-6 py-6 md:px-10 md:py-8 w-full max-w-sm md:max-w-md border border-white/20"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            {/* Heading */}
-            <h2 className="text-2xl font-semibold text-white mb-2 text-center">
-              Login to <span className="text-orange-400">CO₂ Tracker</span>
-            </h2>
-            <p className="text-gray-400 text-sm text-center mb-6">
-              Sign in with your Google account to continue.
+            <p className="text-[#fff] text-lg md:text-xl leading-relaxed mb-8">
+              The energy we use every day—from heating our homes to powering our devices—directly contributes to global CO₂ emissions. Electricity production is one of the largest sources of greenhouse gases. This app helps you track and reduce your footprint.
             </p>
 
             {/* Google Sign-In Button */}
             <button
               onClick={handleLogin}
-              className="flex items-center justify-center w-full gap-3 bg-white/20 border border-white/30 px-6 py-3 rounded-full text-white shadow-md hover:bg-white/30 transition duration-300"
+              className="flex items-center justify-center gap-3 bg-[#d35400] hover:bg-[#b84300] px-6 py-3 text-white rounded-full transition text-sm font-medium shadow-md mx-auto"
             >
               <img src={googleLogo} alt="Google Logo" className="w-5 h-5" />
-              <span className="text-sm font-medium">Sign in with Google</span>
+              Sign in with Google
             </button>
-          </motion.div>
+          </div>
         </div>
-      
-    
     );
 }
 
