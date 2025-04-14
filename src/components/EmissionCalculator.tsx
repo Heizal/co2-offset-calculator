@@ -144,8 +144,7 @@ const EmissionCalculator = () => {
         >
           <h3 className="text-lg font-semibold">Your Estimated Emissions</h3>
           <p className="text-2xl font-bold text-green-700 mt-2">{emissions.toFixed(2)} kg CO₂e</p>
-
-          {/* 🔥 Improved Bar Chart */}
+          {/* Bar chart */}
           <div className="mt-4">
             <h4 className="text-md font-semibold text-gray-700">Comparison</h4>
             <ResponsiveContainer width="100%" height={150}>
