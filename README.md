@@ -78,6 +78,9 @@ Follow the instructions below to set up and run the project locally.
     - `GET /api/emissions` - Retrieve emission data.
     - `POST /api/offset` - Submit offset calculations.
 
+### Conceptual guide
+A full conceptual guide with the system architecture can be found in the [CONCEPTUAL_GUIDE.md](docs/CONCEPTUAL_GUIDE.md)
+
 ## Contributing
 Contributions are welcome! To contribute:
 1. Fork the repository.
