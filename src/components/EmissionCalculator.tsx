@@ -28,15 +28,15 @@ const EmissionCalculator = () => {
 
     setInputError(null);
 
-    // ✅ Fetch the latest emission factor from the API
-  const emissionFactorData = await fetchEmissionFactor(); // Replace with your actual function
+    //Fetch the latest emission factor from the API
+  const emissionFactorData = await fetchEmissionFactor();
 
   if (!emissionFactorData) {
     console.error("Failed to fetch emission factor data");
     return;
   }
 
-  // ✅ Extract sector & region_name from API response
+  //Extract sector & region_name from API response
   const category = emissionFactorData.category || "Unknown"; 
   const region_name = emissionFactorData.region_name || "Unknown";
   const description = emissionFactorData.description || "No specific description";
@@ -52,11 +52,11 @@ const EmissionCalculator = () => {
 
     await saveEmissionData(Number(energy), calculatedEmissions, startDate, endDate, category, region_name, description);
 
-    // ✅ Reset form inputs after calculation
+    //Reset form inputs after calculation
     setEnergy("");  
     setStartDate(null); 
     setEndDate(null);  
-    setAnimateResult(true); // Trigger animation
+    setAnimateResult(true);
   };
 
   // Chart data
