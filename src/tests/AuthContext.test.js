@@ -1,6 +1,6 @@
 import { jsx as _jsx } from "react/jsx-runtime";
 import { render, screen } from "@testing-library/react";
-import { AuthProvider, useAuth } from "./AuthContext";
+import { AuthProvider, useAuth } from "../context/AuthContext";
 const MockComponent = () => {
     const { user } = useAuth();
     return _jsx("div", { children: user ? "Logged In" : "Not Logged In" });

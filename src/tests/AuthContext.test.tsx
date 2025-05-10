@@ -1,5 +1,5 @@
 import {render, screen} from "@testing-library/react";
-import { AuthProvider, useAuth } from "./AuthContext";
+import { AuthProvider, useAuth } from "../context/AuthContext";
 import { ReactNode } from "react";
 
 const MockComponent = () =>{

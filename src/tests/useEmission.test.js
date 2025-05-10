@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { useEmission } from "./useEmissions";
+import { useEmission } from "../hooks/useEmissions";
 import { estimateEmissions } from "../services/api";
 // Mock the API function
 vi.mock("../services/api", () => ({
